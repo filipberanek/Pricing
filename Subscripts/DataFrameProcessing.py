@@ -64,12 +64,26 @@ class DataFrameProcessor:
         #Get piper URL
         washerURL = self.KebolaInst.GetFiles(Constants.DODAVATELWASHER,Constants.OFFSET,Constants.MAXLISTVALUES)
         washerDF = pd.DataFrame()
+        complet = pd.DataFrame()
         washerStringValue = ''
-        washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerURL[0]['url'])), sep=",")
-        InnerContent = pd.DataFrame(json.loads(washersDFPart['OFFERS'][0])).T.reset_index()
-        from pandas.io.json import json_normalize
-        df2 = washersDFPart.merge(washersDFPart.OFFERS.apply(self.do_the_thing), how = 'left', left_index = True, right_index = True)
-        InnerContent['PROD_ID'] = washersDFPart['PROD_ID'][0]
+        for i, washerVal in enumerate(washerURL):
+            washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerVal['url'])), sep=",")
+        #washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerURL[0]['url'])), sep=",")
+        #InnerContent = pd.DataFrame(json.loads(washersDFPart['OFFERS'][0])).T.reset_index()
+        #from pandas.io.json import json_normalize
+        #washersDFPart = washersDFPart.iloc[0:5]
+            for index, row in washersDFPart.iterrows(): 
+                print (row["PROD_ID"],) 
+                print (pd.DataFrame(json.loads(row['OFFERS'])).T)
+                inter = pd.DataFrame(json.loads(row['OFFERS'])).T
+                inter['PROD_ID'] = row["PROD_ID"]
+                if complet.shape[0]>0:
+                    complet = pd.concat([complet,inter])
+                else:
+                    complet = inter
+        #test = washersDFPart.apply(lambda x: (pd.DataFrame(json.loads(x['OFFERS'])).T))
+        #df2 = washersDFPart.merge(washersDFPart.OFFERS.apply(self.do_the_thing), how = 'left', left_index = True, right_index = True)
+        #InnerContent['PROD_ID'] = washersDFPart['PROD_ID'][0]
         print('Output')
 
     # Check whether record is null, or doesn't contain any real data
@@ -78,20 +92,22 @@ class DataFrameProcessor:
             # Convert the json structure into a dataframe, one cell at a time in the relevant column
             x = pd.read_json(row)
             # The last bit of this string (after the last =) will be used as a key for the column labels
-            x['key'] = x['key'].apply(lambda x: x.split("=")[-1])
+            #x['key'] = x['key'].apply(lambda x: x.split("=")[-1])
             # Set this new key to be the index
-            y = x.set_index('key')
+            #y = x.set_index('key')
             # Stack the rows up via a multi-level column index
-            y = y.stack().to_frame().T
+            #y = y.stack().to_frame().T
+            #y = x.stack().to_frame().T
             # Flatten out the multi-level column index
-            y.columns = ['{1}_{0}'.format(*c) for c in y.columns]
+            #y.columns = ['{1}_{0}'.format(*c) for c in y.columns]
 
             #we don't need to re-index
                 # Give the single record the same index number as the parent dataframe (for the merge to work)
                 #y.index = [df.index[i]]
             #we don't need to add to a temp df
             # Append this dataframe on sequentially for each row as we go through the loop
-            return y.iloc[0]
+            #return y.iloc[0]
+            return x.T
         else:
             return pd.Series()
         
