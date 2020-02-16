@@ -66,12 +66,15 @@ class DataFrameProcessor:
         washerDF = pd.DataFrame()
         complet = pd.DataFrame()
         washerStringValue = ''
+        """
         for i, washerVal in enumerate(washerURL):
             washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerVal['url'])), sep=",")
-        #washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerURL[0]['url'])), sep=",")
+        """
+        washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerURL[0]['url'])), sep=",")
         #InnerContent = pd.DataFrame(json.loads(washersDFPart['OFFERS'][0])).T.reset_index()
         #from pandas.io.json import json_normalize
         #washersDFPart = washersDFPart.iloc[0:5]
+        """
             for index, row in washersDFPart.iterrows(): 
                 print (row["PROD_ID"],) 
                 print (pd.DataFrame(json.loads(row['OFFERS'])).T)
@@ -81,6 +84,7 @@ class DataFrameProcessor:
                     complet = pd.concat([complet,inter])
                 else:
                     complet = inter
+        """
         #test = washersDFPart.apply(lambda x: (pd.DataFrame(json.loads(x['OFFERS'])).T))
         #df2 = washersDFPart.merge(washersDFPart.OFFERS.apply(self.do_the_thing), how = 'left', left_index = True, right_index = True)
         #InnerContent['PROD_ID'] = washersDFPart['PROD_ID'][0]
