@@ -71,7 +71,7 @@ class DataFrameProcessor:
             washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerVal['url'])), sep=",")
         """
         washersDFPart = pd.read_csv(StringIO(self.S3Inst.GetFileContent(washerURL[0]['url'])), sep=",")
-        #InnerContent = pd.DataFrame(json.loads(washersDFPart['OFFERS'][0])).T.reset_index()
+        InnerContent = pd.DataFrame(json.loads(washersDFPart['OFFERS'][0])).T.reset_index()
         #from pandas.io.json import json_normalize
         #washersDFPart = washersDFPart.iloc[0:5]
         """
